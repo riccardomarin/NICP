@@ -35,6 +35,14 @@ Run the installation script (it also contains checkpoint download)
 ./install.sh
   ```
 
+Finally, you need to download the smplh model and place it in the ``support_data`` folder. The correct file structure is:
+```
+support_data
+  |__ body_models
+         |__smplh
+             |__neutral
+                 |__model.npz
+```
 You are ready to start!
 
 ## Inference 

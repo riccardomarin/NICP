@@ -21,6 +21,7 @@ pip install -r requirements.txt
 python setup.py develop
 cd ..
 cp -r ./human_body_prior_git/src/* .
+rm -rf human_body_prior_git/
 
 ### External Dependency: IF-NET voxel preprocessings
 pip install cython
