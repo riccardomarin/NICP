@@ -46,6 +46,9 @@ sys.path.append('./preprocess_voxels')
 device = torch.device('cuda')
 import gc 
 
+import warnings
+warnings.filterwarnings("ignore")
+
 def get_dataset(name):
     if name=='demo':
         return path_demo
@@ -54,15 +57,11 @@ def get_dataset(name):
 
 
 def get_model(chk):
-    print(chk)
-    print(glob.glob(chk + 'checkpoints/*.zip'))
     chk_zip = glob.glob(chk + 'checkpoints/*.zip')[0]
     ### Restore the network
     hydra.core.global_hydra.GlobalHydra.instance().clear()
     initialize(config_path="../../../" + str(chk))
-    print("LOL")
     cfg_model = compose(config_name="config")
-    print("LOL1")
     # print(OmegaConf.to_yaml(cfg_model))
     train_data = hydra.utils.instantiate(cfg_model.nn.data.datasets.train, mode="test")
     
@@ -125,29 +124,28 @@ module.cuda()
 
 Rx = trimesh.transformations.rotation_matrix(alpha, xaxis)
 
-print(os.getcwd())
-st.write('# Welcome to NF-ICP Demo!')
-st.write('Use the box below to upload a 3D mesh in .ply')
+st.write('# Welcome to INLoVD Demo!')
+st.write('Use the box below to upload a 3D mesh in .ply.')
 uploaded_file = st.file_uploader("Choose a file")
+
 
 current_GMT = time.gmtime()
 
 if uploaded_file is not None:
     # To read file as bytes:
     time_stamp = calendar.timegm(current_GMT)
-    os.mkdir(os.path.join("streamlitTempDir",str(time_stamp)))
-    
+    os.mkdir(os.path.join("streamlitTempDir", str(time_stamp)))
+    print(os.path.join("streamlitTempDir", str(time_stamp)))
     bytes_data = uploaded_file.getvalue()
 
-    with open(os.path.join("streamlitTempDir",str(time_stamp),uploaded_file.name),"wb") as f:
+    with open(os.path.join("streamlitTempDir", str(time_stamp),uploaded_file.name),"wb") as f:
         f.write(uploaded_file.getbuffer())
         
     T = o3d.io.read_triangle_mesh(os.path.join("streamlitTempDir",uploaded_file.name))    
-    o3d.io.write_triangle_mesh(os.path.join("streamlitTempDir",str(time_stamp),"input.obj"),T)
+    o3d.io.write_triangle_mesh(os.path.join("streamlitTempDir", str(time_stamp),"input.obj"),T)
     
-    scan_src = trimesh.load(os.path.join("streamlitTempDir",str(time_stamp),uploaded_file.name), process=False, maintain_order=True)
+    scan_src = trimesh.load(os.path.join("streamlitTempDir", str(time_stamp),uploaded_file.name), process=False, maintain_order=True)
 
-    
     a = plot_mesh(scan_src,True)
 
     fig = go.Figure(data=[a])
@@ -166,7 +164,7 @@ if uploaded_file is not None:
     scan_src.apply_transform(Rx)
     voxel_src, mesh_src = vox_scan(scan_src, res, style=type, grad=grad)
     st.write("Done! It took " + "{:.2f}".format((time.time() - start)) + " secs")
-    mesh_src.export(os.path.join("streamlitTempDir",str(time_stamp), 'aligned.ply'))
+    mesh_src.export(os.path.join("streamlitTempDir", str(time_stamp), 'aligned.ply'))
     
     st.write("### Running NF-ICP to refine it.")
     start = time.time()
@@ -175,7 +173,7 @@ if uploaded_file is not None:
     module.eval()
     st.write("Done! It took " + "{:.2f}".format((time.time() - start)) + " secs" )
     
-    st.write("### NF Convergence + SMPL fitting ...")
+    st.write("### NF Convergence + SMPL fitting ... (~30 seconds)")
     start = time.time()
     reg_src =  fit_LVD(module, gt_points, voxel_src, iters=50)
     out_s, params = SMPL_fitting(SMPL_model, reg_src, gt_idxs, prior, iterations=2000)
@@ -189,15 +187,15 @@ if uploaded_file is not None:
     fig3['layout']['scene']['aspectmode'] = "data"
     st.plotly_chart(fig3, theme="streamlit", use_container_width=True)
     
-    SMPL_backbone_OUR.export(os.path.join("streamlitTempDir",str(time_stamp), 'our.ply'))
+    SMPL_backbone_OUR.export(os.path.join("streamlitTempDir", str(time_stamp), 'our.ply'))
     
-    st.write("###Running Chamfer refinement ...")
+    st.write("### Running Chamfer refinement ... (~10 seconds)")
     start = time.time()
-    out_cham_s, params = fit_cham(SMPL_model, out_s, mesh_src.vertices, prior,params,0)
+    out_cham_s, params = fit_cham(SMPL_model, out_s, mesh_src.vertices, prior,params)
     st.write("Done! It took " + "{:.2f}".format((time.time() - start)) + " secs" )
     
-    SMPL_backbone_OUR = trimesh.Trimesh(out_s,SMPL_model.faces)
-    SMPL_backbone_OUR.export(os.path.join("streamlitTempDir",str(time_stamp), 'our_ch.ply'))
+    SMPL_backbone_OUR = trimesh.Trimesh(out_cham_s,SMPL_model.faces)
+    SMPL_backbone_OUR.export(os.path.join("streamlitTempDir", str(time_stamp), 'our_ch.ply'))
     c = plot_mesh(SMPL_backbone_OUR,True)
     fig3 = go.Figure(data=[c])
     fig3['layout']['scene']['aspectmode'] = "data"
@@ -205,6 +203,6 @@ if uploaded_file is not None:
     
     for p in params.keys():
         params[p] = params[p].detach().cpu().numpy()            
-    np.save(os.path.join("streamlitTempDir",str(time_stamp), 'params.npy'),params)
+    np.save(os.path.join("streamlitTempDir", str(time_stamp), 'params.npy'),params)
     
     

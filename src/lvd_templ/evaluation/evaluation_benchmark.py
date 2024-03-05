@@ -79,9 +79,10 @@ def run(cfg: DictConfig) -> str:
     # Recover Data Path
     path_in = get_dataset(cfg['core'].challenge)
     
-    # How the data 
+    # How the data are organized
     if(cfg['core'].challenge in ('demo')):
         scans = glob.glob(path_in + '*/*.ply')
+        print('--------------------------------------------')
         print(f'List of target scans: {scans}')
     else:
         scans = glob.glob(path_in + '*.ply')
