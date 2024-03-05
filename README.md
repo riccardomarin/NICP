@@ -10,7 +10,7 @@
   </p>
   <h2 align="center"> </h2>
   <div align="center">
-    <img src="assets/myteaser3.png" alt="teaser" width="70%">
+    <img src="assets/myteaser3.png" alt="teaser" width="100%">
   </div>
 </p> 
 
