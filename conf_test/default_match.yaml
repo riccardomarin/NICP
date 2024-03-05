@@ -1,0 +1,12 @@
+# metadata specialised for each experiment
+core:
+  checkpoint: 1tv3959f
+  challenge: 
+    name: FAUST_test_scans
+    sub: inter
+  overwrite: False
+  regist: out
+  target: aligned
+  tag: ''
+  subdiv: 2
+  datadir: '/home/ubutnu/Documents/Projects/LVD_templ/lvd_templ/output/' #'/mnt/sdb/outputs/'

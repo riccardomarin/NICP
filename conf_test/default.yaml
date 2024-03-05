@@ -1,0 +1,18 @@
+# metadata specialised for each experiment
+core:
+  checkpoint: 1ljjfnbx
+  tag: ''
+  challenge: demo
+  cham_ref: True
+  cham_bidir: 0
+  ss_ref: True
+  overwrite: False
+  steps_ss: 20
+  lr_ss: 0.00001
+  plusD: True
+  #method: Uni
+  init: False
+  lvdcham: False
+  min_dimension: 1
+lvd:
+  iters: 50
