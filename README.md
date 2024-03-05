@@ -2,9 +2,9 @@
   <h1 align="center"> Neural ICP Fields for 3D Human Registration at Scale
  </h1>
  <p align="center">
-    <a href="https://bernakabadayi.github.io/"><strong>Riccardo Marin</strong></a>
+    <a href="https://riccardomarin.github.io/"><strong>Riccardo Marin</strong></a>
     ·
-    <a href="https://zielon.github.io/"><strong>Enric Corona</strong></a>
+    <a href="https://www.iri.upc.edu/people/ecorona/"><strong>Enric Corona</strong></a>
     .
     <a href="https://virtualhumans.mpi-inf.mpg.de/people/pons-moll.html"><strong>Gerard Pons-Moll</strong></a>
   </p>
