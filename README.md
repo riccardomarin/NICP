@@ -16,21 +16,22 @@
 
  [[arXiv]](https://arxiv.org/abs/2312.14024)
 
+This repository contains the inference code for INLoVD registration pipeline.
 
 ## Getting Started
-Clone the repo 
+1) Clone the repo 
   ```bash
   git clone https://github.com/riccardomarin/INLoVD.git INLoVD
   cd INLoVD
   ```  
 
-Create the environment 
+2) Create the environment 
  ```
 conda create -n inlovd python=3.8.13
 conda activate inlovd
   ```
 
-Run the installation script (it also contains checkpoint download)
+3) Run the installation script (it also contains checkpoint download)
  ```
 ./install.sh
   ```
@@ -78,3 +79,9 @@ A complete list of available parameters can be found in ``conf_test/default.yaml
 
 <!-- 
 <img src='./assets/myteaser3.png' width=800> -->
+### TODO
+
+- [x] Inference code for the checkpoint trained on AMASS
+- [ ] Training code
+- [ ] Code to replicate quantitative evaluations
+- [ ] Checkpoints for LoVD and LVD trained on CAPE
