@@ -16,19 +16,19 @@
 
  [[arXiv]](https://arxiv.org/abs/2312.14024)
 
-This repository contains the inference code for INLoVD registration pipeline.
+This repository contains the inference code for NSR registration pipeline. The code has been tested on Linux Ubuntu 20.04.6 LTS, using python 3.8.13, and a GPU GeForce RTX 3080 Ti.  
 
 ## Getting Started
 1) Clone the repo 
   ```bash
-  git clone https://github.com/riccardomarin/INLoVD.git INLoVD
-  cd INLoVD
+  git clone https://github.com/riccardomarin/NICP.git NICP
+  cd NICP
   ```  
 
 2) Create the environment 
  ```
-conda create -n inlovd python=3.8.13
-conda activate inlovd
+conda create -n nsr python=3.8.13
+conda activate nsr
   ```
 
 3) Run the installation script (it also contains checkpoint download)
@@ -36,7 +36,7 @@ conda activate inlovd
 ./install.sh
   ```
 
-Finally, you need to download the smplh model and place it in the ``support_data`` folder. The correct file structure is:
+4) You need to download the smplh model and place it in the ``support_data`` folder. The correct file structure is:
 ```
 support_data
   |__ body_models
@@ -44,10 +44,15 @@ support_data
              |__neutral
                  |__model.npz
 ```
+5) Set the home directory path in ``./src/lvd_templ/paths.py``
+```
+home_dir                          = #e.g., '/home/ubuntu/Documents/7564_code_test/'
+```
+   
 You are ready to start!
 
 ## Inference 
-To use INLoVD and fit all the scans into the ``demo`` folder, you can run the following command:
+To use NSR and fit all the scans into the ``demo`` folder, you can run the following command:
 
 ```
 PYTHONPATH=. python ./src/lvd_templ/evaluation/evaluation_benchmark.py
