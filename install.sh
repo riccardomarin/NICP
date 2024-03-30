@@ -1,14 +1,15 @@
 ### Create Environment
-# conda create -n inlovd_git python=3.8.13
-# conda activate inlovd_git
+# conda create -n nsr python=3.8.13
+# conda activate nsr
 
 # Download checkpoint
-wget oshi.at/hQWV 1ljjfnbx.zip
+wget oshi.at/hQWV
 unzip hQWV -d ./storage/
 rm hQWV
 
-tar -xf neutral_smpl_with_cocoplus_reg.txt.tar.gz
-rm neutral_smpl_with_cocoplus_reg.txt.tar.gz
+wget oshi.at/LYSr
+tar -xf LYSr
+rm LYSr
 
 ### Install Pytorch
 conda install -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
