@@ -46,7 +46,7 @@ support_data
 ```
 5) Set the home directory path in ``./src/lvd_templ/paths.py``
 ```
-home_dir                          = #e.g., '/home/ubuntu/Documents/7564_code_test/'
+home_dir                          = #e.g., '/home/ubuntu/Documents/NICP/'
 ```
    
 You are ready to start!
