@@ -124,7 +124,7 @@ module.cuda()
 
 Rx = trimesh.transformations.rotation_matrix(alpha, xaxis)
 
-st.write('# Welcome to INLoVD Demo!')
+st.write('# Welcome to NSR Demo!')
 st.write('Use the box below to upload a 3D mesh in .ply.')
 uploaded_file = st.file_uploader("Choose a file")
 
@@ -166,7 +166,7 @@ if uploaded_file is not None:
     st.write("Done! It took " + "{:.2f}".format((time.time() - start)) + " secs")
     mesh_src.export(os.path.join("streamlitTempDir", str(time_stamp), 'aligned.ply'))
     
-    st.write("### Running NF-ICP to refine it.")
+    st.write("### Running N-ICP to refine it.")
     start = time.time()
     module.train()
     selfsup_ref(module, torch.tensor(np.asarray(scan_src.vertices)), voxel_src, gt_points,steps=20, lr_opt=0.00001)
