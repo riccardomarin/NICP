@@ -3,11 +3,11 @@
 # conda activate nsr
 
 # Download checkpoint
-wget oshi.at/hQWV
+curl "https://drive.usercontent.google.com/download?id=1WUcOUTPjPfIU2tjfeZ3oWCTfWF70PkK7&confirm=xxx" -o hQWV
 unzip hQWV -d ./storage/
 rm hQWV
 
-wget oshi.at/LYSr
+curl "https://drive.usercontent.google.com/download?id=14zdpTpJ2-6jGRF_MG2HnnAaiGNTPUJ1K&confirm=xxx" -o LYSr
 tar -xf LYSr
 rm LYSr
 
