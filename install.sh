@@ -7,7 +7,7 @@ curl "https://drive.usercontent.google.com/download?id=1WUcOUTPjPfIU2tjfeZ3oWCTf
 unzip hQWV -d ./storage/
 rm hQWV
 
-curl "https://drive.usercontent.google.com/download?id=14zdpTpJ2-6jGRF_MG2HnnAaiGNTPUJ1K&confirm=xxx" -o LYSr
+curl "https://drive.usercontent.google.com/download?id=1QEeeXKtccg6sHeGgDTDti0nPDuodVQ4J&confirm=xxx" -o LYSr
 tar -xf LYSr
 rm LYSr
 
