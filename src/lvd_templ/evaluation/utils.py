@@ -260,14 +260,6 @@ class ChamferDistance(torch.nn.Module):
 
 ################# Voxalize Function
 def voxelize(mesh, res):
-    # Center the shape
-    total_size = (mesh.bounds[1] - mesh.bounds[0]).max()
-    centers = (mesh.bounds[1] + mesh.bounds[0]) /2
-    mesh.apply_translation(-centers)
-    
-    # Scaling
-    mesh.apply_scale(1/total_size)
-    
     # Transform into a grid
     occupancies = voxels.VoxelGrid.from_mesh(mesh, res, loc=[0, 0, 0], scale=1).data
     occupancies = np.reshape(occupancies, -1)
@@ -311,11 +303,6 @@ def voxelize_distance(scan, res):
     b_min = np.array([-0.8, -0.8, -0.8]) 
     b_max = np.array([0.8, 0.8, 0.8])
     step = 5000
-
-    total_size = (scan.bounds[1] - scan.bounds[0]).max()
-    centers = (scan.bounds[1] + scan.bounds[0]) /2
-    scan.apply_translation(-centers)
-    scan.apply_scale(1/total_size)
 
     vertices = scan.vertices
     factor = max(1, int(len(vertices) / 20000)) # We will subsample vertices when there's too many in a scan !

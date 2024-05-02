@@ -111,7 +111,7 @@ def run(cfg: DictConfig) -> str:
     res = MD.class_vocab()['occ_res']
     gt_points = MD.class_vocab()['gt_points']
     gt_idxs = train_data.idxs
-    type = cfg_model['nn']['data']['datasets']['type']
+    data_type = cfg_model['nn']['data']['datasets']['type']
     grad = cfg_model['nn']['module']['grad']
  
     print('--------------------------------------------')
@@ -140,13 +140,19 @@ def run(cfg: DictConfig) -> str:
         # Canonicalize the input point cloud and prepare input of IF-NET
         scan_src = trimesh.load(scan, process=False, maintain_order=True)
         scan_src.apply_transform(Rx)
-        voxel_src, mesh_src = vox_scan(scan_src, res, style=type, grad=grad)
-        
+        centers = (scan_src.bounds[1] + scan_src.bounds[0]) /2
+        scan_src.apply_translation(-centers)
+
         # Save algined mesh
         if not(os.path.exists(out_dir +'/'+ name)):
            os.mkdir(out_dir +'/'+ name)
-        k = mesh_src.export(out_dir +'/'+ name + '/aligned.ply')
-        
+        k = scan_src.export(out_dir +'/'+ name + '/aligned.ply')
+
+        # Normalize scan so that no dimention exceeds 1.0 for Voxelization and LVD 
+        total_size = (scan_src.bounds[1] - scan_src.bounds[0]).max()
+        scan_src.apply_scale(1/total_size)
+
+        voxel_src, mesh_src = vox_scan(scan_src, res, style=data_type, grad=grad)
         #######
         
         # IF N-ICP is requested, run it
@@ -167,7 +173,10 @@ def run(cfg: DictConfig) -> str:
         
         # Fit LVD
         reg_src =  fit_LVD(module, gt_points, voxel_src, iters=cfg['lvd'].iters, init=init)
-            
+        # Restore input scan scale
+        reg_src = reg_src * total_size
+        mesh_src.apply_scale(total_size)
+
         # FIT SMPL Model to the LVD Prediction
         out_s, params = SMPL_fitting(SMPL_model, reg_src, gt_idxs, prior, iterations=2000)
         params_np = {}
