@@ -146,6 +146,12 @@ if uploaded_file is not None:
     
     scan_src = trimesh.load(os.path.join("streamlitTempDir", str(time_stamp),uploaded_file.name), process=False, maintain_order=True)
 
+    centers = (scan_src.bounds[1] + scan_src.bounds[0]) /2
+    scan_src.apply_translation(-centers)
+
+    total_size = (scan_src.bounds[1] - scan_src.bounds[0]).max()
+    scan_src.apply_scale(1/total_size)
+
     a = plot_mesh(scan_src,True)
 
     fig = go.Figure(data=[a])
@@ -155,14 +161,14 @@ if uploaded_file is not None:
     res = MD.class_vocab()['occ_res']
     gt_points = MD.class_vocab()['gt_points']
     gt_idxs = train_data.idxs
-    type = cfg_model['nn']['data']['datasets']['type']
+    data_type = cfg_model['nn']['data']['datasets']['type']
     grad = cfg_model['nn']['module']['grad']
 
     start = time.time()
 
     st.write("### Processing - Voxelizing your input")
     scan_src.apply_transform(Rx)
-    voxel_src, mesh_src = vox_scan(scan_src, res, style=type, grad=grad)
+    voxel_src, mesh_src = vox_scan(scan_src, res, style=data_type, grad=grad)
     st.write("Done! It took " + "{:.2f}".format((time.time() - start)) + " secs")
     mesh_src.export(os.path.join("streamlitTempDir", str(time_stamp), 'aligned.ply'))
     
@@ -176,6 +182,8 @@ if uploaded_file is not None:
     st.write("### NF Convergence + SMPL fitting ... (~30 seconds)")
     start = time.time()
     reg_src =  fit_LVD(module, gt_points, voxel_src, iters=50)
+    reg_src = reg_src * total_size
+    mesh_src.apply_scale(total_size)
     out_s, params = SMPL_fitting(SMPL_model, reg_src, gt_idxs, prior, iterations=2000)
 
     SMPL_backbone_OUR = trimesh.Trimesh(out_s,SMPL_model.faces)
