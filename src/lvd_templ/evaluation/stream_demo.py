@@ -175,7 +175,7 @@ if uploaded_file is not None:
     st.write("Done! It took " + "{:.2f}".format((time.time() - start)) + " secs")
     mesh_src.export(os.path.join("streamlitTempDir", str(time_stamp), 'aligned.ply'))
     
-    st.write("### Running NF-ICP to refine it.")
+    st.write("### Running N-ICP to refine it.")
     start = time.time()
     module.train()
     selfsup_ref(module, torch.tensor(np.asarray(scan_src.vertices)), voxel_src, gt_points,steps=20, lr_opt=0.00001)

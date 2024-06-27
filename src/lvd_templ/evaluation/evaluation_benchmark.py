@@ -212,7 +212,7 @@ def run(cfg: DictConfig) -> str:
         
         #######
         
-        # IF NF-ICP is requested, run it
+        # IF N-ICP is requested, run it
         if cfg['core'].ss_ref:
             # We add a name to specify the NF-ICP is performed
             out_name = out_name + '_ss'
