@@ -1,0 +1,14 @@
+# Path to the cloned repo with src folder inside
+HUMAN_BODY_PRIOR_REPO = "/home/ubutnu/Documents/Projects/preprocpub/prior"
+
+# Path to the cloned repo
+AMASS_REPO = "/home/ubutnu/Documents/Projects/preprocpub/AMASS"
+
+# relative to AMASS_REPO or absolute
+SMPL_DIR = "/mnt/sda/Projects/AMASS/support_data/body_models/smplh"
+
+# Path to extracted AMASS data
+AMASS_DATA = "/mnt/sda/Projects/AMASS/support_data/amass_npz/"
+
+# Path to preprocessed data
+TARGET_DATA = "/mnt/sdb/out_AMASS"

@@ -26,3 +26,5 @@ output/FAUST_train_scans/_lvv6zyw4_out_ss_cham_0_2_
 demo/pc_andrea
 demo/pc_andrea2
 .vscode
+*.pyx
+model.npz

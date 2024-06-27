@@ -115,5 +115,7 @@ PYTHONPATH=. python ./src/lvd_templ/evaluation/get_error.py core.evaluate="_1ljj
 ```
 Libraries updates might have a minor impact on the numbers.
 
+## Other checkpoints (CAPE, SCAPE, 5K AMASS)
+Other checkpoints used in our experiments can be found [here](https://drive.google.com/file/d/1h5ozzdkwg0x-EgW5T-ropNzdJwjswmyy/view?usp=sharing)
 <!-- 
 <img src='./assets/myteaser3.png' width=800> -->

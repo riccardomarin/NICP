@@ -1,0 +1,71 @@
+data:
+  _target_: lvd_templ.data.datamodule_AMASS.MyDataModule
+  overfit: False
+  gpus: ${train.trainer.gpus}
+
+  datasets:
+    version: AUG_1_1 
+    n_data: 0
+    n_points: 0 
+    template: False
+    red_factor: 10
+    type: occ_dist
+    res: 64
+    
+    train:
+      _target_: lvd_templ.data.dataset_AMASS_occ.AMASSDataset
+      version:  ${nn.data.datasets.version}
+      n_data:   ${nn.data.datasets.n_data}
+      data_path: "/mnt/sdb/out_AMASS/"
+      n_points: ${nn.data.datasets.n_points} 
+      template: ${nn.data.datasets.template}
+      seed_idxs: 0
+      fine_std: 0.05
+      n_uniform: 400
+      n_fine_sampled: 1800
+      red_factor: ${nn.data.datasets.red_factor}
+      type: ${nn.data.datasets.type}
+      res: ${nn.data.datasets.res}
+      v_locality: 0
+      segm: ${nn.module.segm}
+      coeffs: False
+      
+  num_workers:
+    train: 24
+    val: 16
+    test: 16
+
+  batch_size:
+    train: 8
+    val: 4
+    test: 4
+
+# Pytorch lightning module
+module:
+  _target_: lvd_templ.pl_modules.pl_module_ifnet.LightUniversal
+  paradigm: LoVD
+  smpl_path: "./support_data/body_models/smplh/neutral/model.npz"
+  n_basis: 20
+  n_desc: 40
+  n_layers: 10
+  size_layers: 256
+  n_points: ${nn.data.datasets.train.n_points}
+  template: ${nn.data.datasets.template}
+  fine_std: ${nn.data.datasets.train.fine_std}
+  n_uniform: ${nn.data.datasets.train.n_uniform}
+  n_fine_sampled: ${nn.data.datasets.train.n_fine_sampled}
+  grad: 100
+  clamp: 0.05
+  clamp_style: 1
+  gpus: ${train.trainer.gpus}
+  powerup: 1
+  power_factor: 2
+  segm: 16
+  onlydir: False
+
+  optimizer:
+    _target_: torch.optim.Adam
+    lr: 0.0001
+    betas: [ 0.9, 0.999 ]
+    eps: 1e-08
+    weight_decay: 0
