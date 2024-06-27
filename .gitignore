@@ -4,7 +4,7 @@ src/lvd_templ/__pycache__
 human_body_prior*
 storage/1ljjfnbx
 utils_cop
-data
+data/preprocess_voxels
 lvd_templ.egg-info
 outputs
 neutral_smpl_with_cocoplus_reg.*
@@ -28,3 +28,6 @@ demo/pc_andrea2
 .vscode
 *.pyx
 model.npz
+__pycache__
+*.so
+training/data/preprocess_voxels
