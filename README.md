@@ -15,7 +15,14 @@
 </p> 
 
  [[arXiv]](https://arxiv.org/abs/2312.14024)
-
+```bibtex
+@article{marin2024nicp,
+      title={NICP: Neural ICP for 3D Human Registration at Scale}, 
+      author={Riccardo Marin and Enric Corona and Gerard Pons-Moll},
+      journal={arXiv preprint arXiv:2312.14024},
+      year={2024},
+}
+```
 This repository contains the inference code for NSR registration pipeline. The code has been tested on Linux Ubuntu 20.04.6 LTS, using python 3.8.13, and a GPU GeForce RTX 3080 Ti.  
 
 ## Getting Started
