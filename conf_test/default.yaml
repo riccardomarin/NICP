@@ -14,5 +14,7 @@ core:
   init: False
   lvdcham: False
   min_dimension: 1
+  scaleback: False
+  guess_rot: False
 lvd:
   iters: 50

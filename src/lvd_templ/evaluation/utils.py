@@ -275,7 +275,8 @@ def voxelize(mesh, res):
     if not occupancies.any():
         raise ValueError('No empty voxel grids allowed.')
 
-    return occupancies, mesh
+    
+    return occupancies, mesh, total_size, centers
 
 
 
@@ -341,7 +342,7 @@ def voxelize_distance(scan, res):
         signed_distance = np.concatenate(all_distances)
 
     voxels = signed_distance.reshape(resolution, resolution, resolution)
-    return voxels, scan
+    return voxels, scan, total_size, centers
 
 #######
 
@@ -417,7 +418,7 @@ def SMPL_fitting(SMPL_model, in_points, gt_idxs, prior, iterations = 1000):
 def selfsup_ref(module, input_points, voxel_src, gt_points,steps=10, lr_opt=0.00001):
     optimizer = torch.optim.Adam(module.parameters(), lr=lr_opt)
 
-    for i in tqdm.tqdm(np.arange(0,steps),desc="NF-ICP"):
+    for i in tqdm.tqdm(np.arange(0,steps),desc="NICP"):
         # Sample points on the target surface
         with torch.no_grad():
             factor = max(1, int(input_points.shape[0] / 20000))
@@ -519,9 +520,9 @@ def get_match_LVD(s_src, s_tar, reg_src, reg_tar):
 
 def vox_scan(scan, res, style='occ', grad=0,device='cuda', margin=0.8,center=True,scale=True):
     if style=='occ':
-        voxel_src, mesh = voxelize(scan, res) #self.voxelize_scan(scan)
+        voxel_src, mesh, total_size, centers = voxelize(scan, res) #self.voxelize_scan(scan)
     else:
-        voxel_src, mesh = voxelize_distance(scan, res)
+        voxel_src, mesh, total_size, centers = voxelize_distance(scan, res)
         
         
     voxel_src = torch.FloatTensor(voxel_src)[None, None].to(device)
@@ -556,7 +557,7 @@ def vox_scan(scan, res, style='occ', grad=0,device='cuda', margin=0.8,center=Tru
                             ), 1)
         voxel_src = torch.reshape(voxel_src,(1,7,res,res,res))
     
-    return voxel_src, mesh
+    return voxel_src, mesh, total_size, centers
 
 
 def fit_LVD(module, gt_points, voxel_src, iters=20, init=None):

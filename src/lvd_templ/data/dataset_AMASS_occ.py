@@ -61,7 +61,11 @@ class AMASSDataset(Dataset):
         self.factor   = kwargs["red_factor"]  # Reduction factors
         self.type     = kwargs["type"]        # Type of input (Occupancy, SDF)
         self.segm     = kwargs["segm"]        # Number of local segments
-        self.locality = kwargs["locality"]
+        if "locality" in kwargs.keys():
+            self.locality = kwargs["locality"]
+        else:
+            self.locality = 0
+            
         
         # Voxalization resolution
         self.occ_res  = kwargs["res"]
@@ -90,7 +94,8 @@ class AMASSDataset(Dataset):
             evals, evecs = sla.eigsh(L, self.segm, A, sigma=1e-8)                   # Laplacian Eigendecomposition
             kmeans = KMeans(n_clusters=self.segm, random_state=0).fit(evecs)        # K-Means on eigenvectors
             self.labels = kmeans.labels_                                            # SAVE LABELS
-        #   np.save('segms_' + str(self.segm), self.labels)                         # Save it locally 
+            unique, counts = np.unique(self.labels, return_counts=True)
+            #   np.save('segms_' + str(self.segm), self.labels)                         # Save it locally 
         else:
             self.labels = []
             

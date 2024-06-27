@@ -1,11 +1,6 @@
 # metadata specialised for each experiment
 core:
-  checkpoint: 1ljjfnbx
+  evaluate : _1ljjfnbx_out_ss_cham_0_0_
   challenge: 
     name: FAUST_train_reg
-  overwrite: False
-  regist: out
-  target: aligned
-  tag: ''
-  subdiv: 0
   datadir: '/home/ubutnu/Documents/Projects/NFICP-INFERENCE_upload_minimal/GIT_repo/output/' #'/mnt/sdb/outputs/'

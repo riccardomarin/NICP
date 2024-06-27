@@ -18,7 +18,7 @@ from utils_cop.SMPL import SMPL
 from nn_core.common import PROJECT_ROOT
 from nn_core.serialization import NNCheckpointIO
 
-from lvd_templ.paths import chk_pts, home_dir, output_dir as out_folder, path_demo
+from lvd_templ.paths import chk_pts, home_dir, output_dir as out_folder, path_demo, path_demo_guess_rot, path_FAUST_train_reg, path_FAUST_train_scans
 from lvd_templ.data.datamodule_AMASS import MetaData
 from lvd_templ.evaluation.utils import vox_scan, fit_LVD, selfsup_ref, SMPL_fitting, fit_cham, fit_plus_D
 
@@ -28,10 +28,24 @@ warnings.filterwarnings("ignore")
 ## Device
 device = torch.device('cuda')
 
+def export_mesh(T, r,t,s, path):
+        T.apply_scale(s)
+        T.apply_translation(t)
+        T.apply_transform(r)
+        
+        k = T.export(path)
+        return
+
 ## Here you can set the path for different datasets
 def get_dataset(name):
     if name=='demo':
-        return path_demo  
+        return path_demo
+    if name=='demo_guess_rot':
+        return path_demo_guess_rot
+    if name=='FAUST_train_scans':
+        return path_FAUST_train_scans
+    if name=='FAUST_train_reg':
+        return path_FAUST_train_reg
     raise ValueError('this challenge does not exists')
 
 ## Function to load checkpoint
@@ -80,24 +94,23 @@ def run(cfg: DictConfig) -> str:
     path_in = get_dataset(cfg['core'].challenge)
     
     # How the data are organized
-    if(cfg['core'].challenge in ('demo')):
+    if(cfg['core'].challenge in ('demo','demo_guess_rot')):
         scans = glob.glob(path_in + '*/*.ply')
-        print('--------------------------------------------')
-        print(f'List of target scans: {scans}')
     else:
         scans = glob.glob(path_in + '*.ply')
 
-    # Here you can add an initial rotation for the shapes to align
+    print('--------------------------------------------')
+    print(f'List of target scans: {scans}')
+    
+    # You can add an initial rotation for the shapes to align
     # The axis.This one works for the FAUST shapes
     
     origin, xaxis = [0, 0, 0], [1, 0, 0]
-    if cfg['core'].challenge=='demo':
+    if cfg['core'].challenge in ('demo','demo_guess_rot'):
         alpha = np.pi/2 #0
     else:
-        alpha = 0
-        
-    Rx = trimesh.transformations.rotation_matrix(alpha, xaxis)
-    
+        alpha = np.pi/2
+      
     ### Get SMPL model
     SMPL_model = SMPL('neutral_smpl_with_cocoplus_reg.txt', obj_saveable = True).cuda()
     prior = MaxMixturePrior(prior_folder='utils_cop/prior/', num_gaussians=8) 
@@ -111,7 +124,7 @@ def run(cfg: DictConfig) -> str:
     res = MD.class_vocab()['occ_res']
     gt_points = MD.class_vocab()['gt_points']
     gt_idxs = train_data.idxs
-    type = cfg_model['nn']['data']['datasets']['type']
+    data_type = cfg_model['nn']['data']['datasets']['type']
     grad = cfg_model['nn']['module']['grad']
  
     print('--------------------------------------------')
@@ -127,25 +140,75 @@ def run(cfg: DictConfig) -> str:
         out_name = 'out' + cfg['core'].tag
         
         # Scans name format
-        if(cfg['core'].challenge != 'demo'):
-            name = os.path.basename(os.path.dirname(scan))
-        else:
-            name = os.path.basename(scan)[:-4]
+        # if(cfg['core'].challenge == 'demo'):
+        #     name = os.path.basename(os.path.dirname(scan))
+        # else:
+        name = os.path.basename(scan)[:-4]
          
         # If we want to use the Neural ICP Refinement    
         if cfg['core'].ss_ref:
             del module, train_data
             module, MD, train_data, cfg_model = get_model(chk)
-
-        # Canonicalize the input point cloud and prepare input of IF-NET
-        scan_src = trimesh.load(scan, process=False, maintain_order=True)
-        scan_src.apply_transform(Rx)
-        voxel_src, mesh_src = vox_scan(scan_src, res, style=type, grad=grad)
         
+        # Read input shape       
+        scan_src = trimesh.load(scan, process=False, maintain_order=True)
+        
+        # EXPERIMENTAL FEATURE: you can use NICP loss to guess the best rotation for the input shape
+
+        if cfg['core'].guess_rot==True:   
+            print("Seeking for the rotation that minimizes NICP...")
+            best_loss = np.inf
+            set_axis = [[1, 0, 0],[0, 1, 0],[0, 0, 1],[0, 1, 1],[1, 1, 0],[1, 0, 1]]
+            set_angles = np.linspace(0,2*np.pi,5)
+            for ax in set_axis:
+                for al in set_angles:
+                    Rx = trimesh.transformations.rotation_matrix(al, ax)
+                    with torch.no_grad():
+                        mesh_src_copy = scan_src.copy()
+                        voxel_src, mesh_src, scale, trasl = vox_scan(mesh_src_copy, res, style=data_type, grad=grad)
+                        
+                        # Extract Features
+                        module.model(voxel_src)
+                        input_points = torch.tensor(np.asarray(mesh_src.vertices))
+                        factor = max(1, int(input_points.shape[0] / 20000))
+                        input_points = input_points[torch.randperm(input_points.size()[0])]
+                        input_points_res = input_points[1:input_points.shape[0]:factor,:].type(torch.float32).unsqueeze(0).cuda()
+                                        
+                        # Query points on the target surface
+                        pred_dist = module.model.query(input_points_res)
+                        
+                        pred_dist = pred_dist.reshape(1, gt_points, 3, -1).permute(0, 1, 3, 2)
+                        
+                        # Collect the offset with the minimum norm for each target vertex
+                        v, _ = torch.min(torch.sum(pred_dist**2,axis=3),axis=1)
+                        
+                        # Global loss
+                        if  torch.sum(v)<best_loss:
+                            best_loss = torch.sum(v)
+                            best_alpha = al
+                            best_axis = ax
+            Rx = trimesh.transformations.rotation_matrix(al, ax)
+            inv_Rx = trimesh.transformations.rotation_matrix(-al, ax)
+            print("Done!")
+        else:
+            Rx = trimesh.transformations.rotation_matrix(alpha, xaxis)
+            inv_Rx = trimesh.transformations.rotation_matrix(-alpha, xaxis)
+        
+        # Canonicalize the input point cloud and prepare input of IF-NET
+        scan_src.apply_transform(Rx)
+        voxel_src, mesh_src, scale, trasl = vox_scan(scan_src, res, style=data_type, grad=grad)
+                
         # Save algined mesh
         if not(os.path.exists(out_dir +'/'+ name)):
            os.mkdir(out_dir +'/'+ name)
-        k = mesh_src.export(out_dir +'/'+ name + '/aligned.ply')
+        
+        if not(cfg['core'].scaleback): 
+           trasl = trasl*0
+           scale = 1
+           inv_Rx = np.eye(4)
+        
+        export_mesh(mesh_src.copy(), inv_Rx, trasl, scale, out_dir +'/'+ name + '/aligned.ply')               
+        # k = mesh_src.export(out_dir +'/'+ name + '/aligned.ply')
         
         #######
         
@@ -178,7 +241,7 @@ def run(cfg: DictConfig) -> str:
         # NOTE: You may want to remove this if you are interested only
         # in the final registration
         T = trimesh.Trimesh(vertices = out_s, faces = SMPL_model.faces) 
-        T.export(out_dir +'/'+ name + '/' + out_name + '.ply')   #SHREC: 85
+        export_mesh(T.copy(), inv_Rx, trasl, scale, out_dir +'/'+ name + '/' + out_name + '.ply')   
         np.save(out_dir +'/'+ name + '/loss_' + out_name + '.npy',params_np)
         
         # SMPL Refinement with Chamfer            
@@ -193,8 +256,8 @@ def run(cfg: DictConfig) -> str:
             out_cham_s, params = fit_cham(SMPL_model, out_s, mesh_src.vertices, prior,params,cfg['core'].cham_bidir)
             
             # Save Output
-            T = trimesh.Trimesh(vertices = out_cham_s, faces = SMPL_model.faces) 
-            T.export(out_dir +'/'+ name + '/' + out_name + '.ply') 
+            T = trimesh.Trimesh(vertices = out_cham_s, faces = SMPL_model.faces)
+            export_mesh(T.copy(), inv_Rx, trasl, scale, out_dir +'/'+ name + '/' + out_name + '.ply')   
             
             # DEBUG: Save some params of the fitting to check quality of the registration          
             # for p in params.keys():
@@ -209,7 +272,7 @@ def run(cfg: DictConfig) -> str:
             smpld_vertices, faces, params = fit_plus_D(out_s, SMPL_model, mesh_src.vertices, subdiv= 1, iterations=300)
             T = trimesh.Trimesh(vertices = smpld_vertices, faces = faces)
             out_name_grid = out_name + '_+D'
-            T.export(out_dir +'/'+ name + '/' + out_name_grid + '.ply')      
+            export_mesh(T.copy(), inv_Rx, trasl, scale, out_dir +'/'+ name + '/' + out_name_grid + '.ply') 
         gc.collect()
         
 @hydra.main(config_path=str(PROJECT_ROOT / "conf_test"), config_name="default")

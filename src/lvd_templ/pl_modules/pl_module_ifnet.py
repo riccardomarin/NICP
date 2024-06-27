@@ -381,7 +381,7 @@ class LightUniversal(pl.LightningModule):
         self.fetch_kwargs(kwargs)
 
         # LVD: A model, with a learnable context, and a query method for novel PCs
-        if self.paradigm == "LVD":  # LVD: A model, with a learnable context, and a query method for novel PCs
+        if self.paradigm in ["LVD","LoVD"]:  # LVD: A model, with a learnable context, and a query method for novel PCs
             if self.powerup==1:
                 self.model = Network_LVD_PowerUP(self.size_layers, self.gt_points*3, res=self.occ_res, input_dim=self.input_dim , b_min = np.array([-0.8, -0.8, -0.8]), b_max = np.array([0.8, 0.8, 0.8]), selfsup=self.selfsup, segm=self.segm, labels=self.labels, unsup=self.unsup)            
             elif self.powerup==2:

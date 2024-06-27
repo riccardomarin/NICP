@@ -49,6 +49,15 @@ import gc
 import warnings
 warnings.filterwarnings("ignore")
 
+def export_mesh(T, r,t,s, path):
+        T.apply_scale(s)
+        T.apply_translation(t)
+        T.apply_transform(r)
+        
+        k = T.export(path)
+        return
+
+
 def get_dataset(name):
     if name=='demo':
         return path_demo
@@ -124,7 +133,7 @@ module.cuda()
 
 Rx = trimesh.transformations.rotation_matrix(alpha, xaxis)
 
-st.write('# Welcome to INLoVD Demo!')
+st.write('# Welcome to NSR Demo!')
 st.write('Use the box below to upload a 3D mesh in .ply.')
 uploaded_file = st.file_uploader("Choose a file")
 
@@ -162,7 +171,7 @@ if uploaded_file is not None:
 
     st.write("### Processing - Voxelizing your input")
     scan_src.apply_transform(Rx)
-    voxel_src, mesh_src = vox_scan(scan_src, res, style=type, grad=grad)
+    voxel_src, mesh_src, scale, trasl = vox_scan(scan_src, res, style=type, grad=grad)
     st.write("Done! It took " + "{:.2f}".format((time.time() - start)) + " secs")
     mesh_src.export(os.path.join("streamlitTempDir", str(time_stamp), 'aligned.ply'))
     
