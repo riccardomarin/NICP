@@ -17,21 +17,16 @@
  [[arXiv]](https://arxiv.org/abs/2312.14024)
 
 This repository contains the inference code for NSR registration pipeline. The code has been tested on Linux Ubuntu 20.04.6 LTS, using python 3.8.13, and a GPU GeForce RTX 3080 Ti.  
-This repository contains the inference code for NSR registration pipeline. The code has been tested on Linux Ubuntu 20.04.6 LTS, using python 3.8.13, and a GPU GeForce RTX 3080 Ti.  
 
 ## Getting Started
 1) Clone the repo 
   ```bash
   git clone https://github.com/riccardomarin/NICP.git NICP
   cd NICP
-  git clone https://github.com/riccardomarin/NICP.git NICP
-  cd NICP
   ```  
 
 2) Create the environment 
  ```
-conda create -n nsr python=3.8.13
-conda activate nsr
 conda create -n nsr python=3.8.13
 conda activate nsr
   ```
@@ -41,7 +36,6 @@ conda activate nsr
 ./install.sh
   ```
 
-4) You need to download the smplh model and place it in the ``support_data`` folder. The correct file structure is:
 4) You need to download the smplh model and place it in the ``support_data`` folder. The correct file structure is:
 ```
 support_data
@@ -55,15 +49,9 @@ support_data
 home_dir                          = #e.g., '/home/ubuntu/Documents/NICP/'
 ```
    
-5) Set the home directory path in ``./src/lvd_templ/paths.py``
-```
-home_dir                          = #e.g., '/home/ubuntu/Documents/NICP/'
-```
-   
 You are ready to start!
 
 ## Inference 
-To use NSR and fit all the scans into the ``demo`` folder, you can run the following command:
 To use NSR and fit all the scans into the ``demo`` folder, you can run the following command:
 
 ```
