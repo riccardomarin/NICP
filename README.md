@@ -14,12 +14,12 @@
   </div>
 </p> 
 
- [[arXiv]](https://arxiv.org/abs/2312.14024)
+ [[arXiv]](https://arxiv.org/abs/2312.14024) [[Project Page]](https://neural-icp.github.io/)
 ```bibtex
 @article{marin2024nicp,
       title={NICP: Neural ICP for 3D Human Registration at Scale}, 
       author={Riccardo Marin and Enric Corona and Gerard Pons-Moll},
-      journal={arXiv preprint arXiv:2312.14024},
+      booktitle={European Conference on Computer Vision},
       year={2024},
 }
 ```
@@ -117,3 +117,6 @@ Libraries updates might have a minor impact on the numbers.
 
 <!-- 
 <img src='./assets/myteaser3.png' width=800> -->
+
+## Acknowledgments
+Thanks to Garvita Tiwari for the proofreading and feedback, Ilya Petrov for code refactoring, and the whole RVH team for the support. The project was made possible by funding from the Carl Zeiss Foundation. This work is supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) - 409792180 (Emmy Noether Programme, project:  Real Virtual Humans), German Federal Ministry of Education and Research (BMBF): Tübingen AI Center, FKZ: 01IS18039A. This project has received funding from the European Union’s Horizon 2020 research and innovation program under the Marie Skłodowska-Curie grant agreement No 101109330. Gerard Pons-Moll is a member of the Machine Learning Cluster of Excellence, EXC number 2064/1 - Project number 390727645. 
