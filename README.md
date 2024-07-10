@@ -21,6 +21,7 @@
       author={Riccardo Marin and Enric Corona and Gerard Pons-Moll},
       booktitle={European Conference on Computer Vision},
       year={2024},
+      organization={Springer}
 }
 ```
 This repository contains the inference code for NSR registration pipeline. The code has been tested on Linux Ubuntu 20.04.6 LTS, using python 3.8.13, and a GPU GeForce RTX 3080 Ti.  
