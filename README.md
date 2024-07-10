@@ -19,7 +19,7 @@
 @article{marin2024nicp,
       title={NICP: Neural ICP for 3D Human Registration at Scale}, 
       author={Riccardo Marin and Enric Corona and Gerard Pons-Moll},
-      booktitle={European Conference on Computer Vision},
+      inproceedings={European Conference on Computer Vision},
       year={2024},
       organization={Springer}
 }
