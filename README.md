@@ -44,7 +44,7 @@ conda activate nsr
 ./install.sh
   ```
 
-4) You need to download the smplh model and place it in the ``support_data`` folder. The correct file structure is:
+4) You need to download the SMPL+H model: go to this link: https://mano.is.tue.mpg.de/download.php, register an account, and download the Extended SMPL+H model. Then, place it in the ``support_data`` folder. The correct file structure is:
 ```
 support_data
   |__ body_models
